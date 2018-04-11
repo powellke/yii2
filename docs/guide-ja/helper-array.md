@@ -52,6 +52,56 @@ $fullName = ArrayHelper::getValue($user, function ($user, $defaultValue) {
 $username = ArrayHelper::getValue($comment, 'user.username', 'Unknown');
 ```
 
+## 値を設定する <span id="setting-values"></span>
+
+```php
+$array = [
+    'key' => [
+        'in' => ['k' => 'value']
+    ]
+];
+
+ArrayHelper::setValue($array, 'key.in', ['arr' => 'val']);
+// `$array` で値を書くためのパスは配列として指定することも出来ます
+ArrayHelper::setValue($array, ['key', 'in'], ['arr' => 'val']);
+```
+
+結果として、`$array['key']['in']` の初期値は新しい値によって上書きされます。
+
+```php
+[
+    'key' => [
+        'in' => ['arr' => 'val']
+    ]
+]
+```
+
+パスが存在しないキーを含んでいる場合は、キーが作成されます。
+
+```php
+// `$array['key']['in']['arr0']` が空でなければ、値が配列に追加される
+ArrayHelper::setValue($array, 'key.in.arr0.arr1', 'val');
+
+// `$array['key']['in']['arr0']` の値を完全に上書きしたい場合は
+ArrayHelper::setValue($array, 'key.in.arr0', ['arr1' => 'val']);
+```
+
+結果は以下のようになります
+
+```php
+[
+    'key' => [
+        'in' => [
+            'k' => 'value',
+            'arr0' => ['arr1' => 'val']
+        ]
+    ]
+]
+```
+
+
+## 配列から値を取り除く <span id="removing-values"></span>
+
 値を取得して、その直後にそれを配列から削除したい場合は、`remove` メソッドを使うことが出来ます。
 
 ```php
@@ -88,7 +138,7 @@ if (!ArrayHelper::keyExists('username', $data1, false) || !ArrayHelper::keyExist
 良くある例は、ID のリストの取得です。
 
 ```php
-$data = [
+$array = [
     ['id' => '123', 'data' => 'abc'],
     ['id' => '345', 'data' => 'def'],
 ];
@@ -114,7 +164,7 @@ $result = ArrayHelper::getColumn($array, function ($element) {
 
 `$groups` 属性はキーの配列であり、入力値の配列を一つまたは複数のサブ配列にグループ化するために使用されます。
 
-特定の要素の `$key` 属性またはその値が null であるとき、`$groups` が定義されていない場合は、その要素は破棄されて、結果には入りません。
+特定の要素の `$key` 属性またはその値が `null` であるとき、`$groups` が定義されていない場合は、その要素は破棄されて、結果には入りません。
 そうではなく、`$groups` が指定されている場合は、配列の要素はキー無しで結果の配列に追加されます。
 
 例えば、
@@ -197,7 +247,7 @@ $result = ArrayHelper::index($array, 'data', [function ($element) {
 
 ## マップを作成する <span id="building-maps"></span>
 
-多次元配列またはオブジェクトの配列からマップ (キー-値 のペア) を作成するためには `map` メソッドを使うことが出来ます。
+多次元配列またはオブジェクトの配列からマップ (キー・値 のペア) を作成するためには `map` メソッドを使うことが出来ます。
 `$from` と `$to` のパラメータで、マップを構成するキー名またはプロパティ名を指定します。
 オプションで、グループ化のためのフィールド `$group` に従って、マップをグループ化することも出来ます。
 例えば、
@@ -369,7 +419,7 @@ $result = ArrayHelper::merge($array1, $array2);
 ## オブジェクトを配列に変換する <span id="converting-objects-to-arrays"></span>
 
 オブジェクトまたはオブジェクトの配列を配列に変換する必要があることがよくあります。
-最もよくあるのは、REST API によってデータ配列を提供するなどの目的で、アクティブレコードモデルを変換する場合です。
+最もよくあるのは、REST API によってデータ配列を提供するなどの目的で、アクティブレコード・モデルを変換する場合です。
 そうするために、次のコードを使うことが出来ます。
 
 ```php
@@ -398,7 +448,7 @@ $data = ArrayHelper::toArray($posts, [
 - キー/値 のペア - 配列のキー名にしたい文字列と、値を取得すべきモデルのカラムの名前。
 - キー/値 のペア - 配列のキー名にしたい文字列と、値を返すコールバック。
 
-変換の結果は以下のようになります。
+単一のモデルに対する上記の変換の結果は以下のようになります。
 
 
 ```php
